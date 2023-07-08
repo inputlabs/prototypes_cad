@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ FreeCAD Document, see http://www.freecadweb.org for more information...
+-->
+<Document SchemaVersion="1" FileVersion="2" Split="1" HasExpansion="1">
+<Expand  count="1">
+  <Expand name="Body" count="2">
+    <Expand name="Pad"/>
+    <Expand name="AdditiveLoft"/>
+  </Expand>
+</Expand>
+  <Camera extra="0" id="1" binding="0" view3d="1">
+<![CDATA[
+OrthographicCamera {
+  viewportMapping ADJUST_CAMERA
+  position 44.555832 -94.209892 68.52359
+  orientation 0.88332701 0.23215804 0.40722969  1.1462512
+  nearDistance 109.63366
+  farDistance 131.61494
+  aspectRatio 1
+  focalDistance 100
+  height 35.700958
+
+}
+## overrideMode: As Is]]>
+  </Camera>
+  <View3D id="1"><![CDATA[
+  <Properties Count="2" TransientCount="0">
+    <Property name="DrawStyle" type="App::PropertyEnumeration" status="1">
+      <Integer value="0"/>
+    </Property>
+    <Property name="ShowNaviCube" type="App::PropertyBool" status="1">
+      <Bool value="true"/>
+    </Property>
+  </Properties>
+]]>
+  </View3D>
+</Document>
