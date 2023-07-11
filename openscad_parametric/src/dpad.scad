@@ -1,4 +1,4 @@
-include <../lib/cad.scad>
+include <../lib/parametric.scad>
 include <../lib/annotate.scad>
 
 // Sketch 1.
