@@ -30,19 +30,19 @@ function mirrorx (path) =
         reverse(xflip(path))
     );
 
-function line_horizontal (orig, value, constrain_x=undef) = [
-    constrain_x==undef ? orig.x + value : constrain_x,
-    orig.y
+function line_horizontal (from, value, constrain_x=undef) = [
+    constrain_x==undef ? from.x + value : constrain_x,
+    from.y
 ];
 
-function line_vertical (orig, value, constrain_y=undef) = [
-    orig.x,
-    constrain_y==undef ? orig.y + value : constrain_y
+function line_vertical (from, value, constrain_y=undef) = [
+    from.x,
+    constrain_y==undef ? from.y + value : constrain_y
 ];
 
-function line (orig, value, constrain_x=undef, constrain_y=undef) = [
-    constrain_x==undef ? orig.x + value.x : constrain_x,
-    constrain_y==undef ? orig.y + value.y : constrain_y
+function line (from, value, constrain_x=undef, constrain_y=undef) = [
+    constrain_x==undef ? from.x + value.x : constrain_x,
+    constrain_y==undef ? from.y + value.y : constrain_y
 ];
 
 origin = [0, 0];
