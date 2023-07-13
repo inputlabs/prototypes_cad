@@ -39,7 +39,7 @@ module wheelHolder(anchor=BOTTOM, spin=0, orient=UP) {
       RIGHT,
       0
     ),
-    named_anchor("print", [0, 0, 0], UP, 0)
+    named_anchor("print", [0, 0, -wheelHolderHeight/2], UP, 0)
   ];
 
   attachable(

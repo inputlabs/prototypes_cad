@@ -6,6 +6,7 @@ include <parameters.scad>
 include <common_references.scad>
 
 // Project dependencies
+use <util.scad>
 use <wheel_shaft.scad>
 
 // Section: Encoder wheel
@@ -73,6 +74,7 @@ module _wheel_body_star(n) {
  *   n = The number of vertices to form the body.
  */
 module _wheel_body(type, n) {
+  assert(is_in(type, WHEEL_TYPES), "Invalid wheel type");
   assert(is_num(n) && round(n) == n, "Vertex count must be an integer");
   assert(n > 3, "Vertex count must be more than 3");
   
@@ -101,6 +103,9 @@ module _wheel_body(type, n) {
  *   print = Print orientation
  */
 module wheel(type=WHEEL_TYPE_STAR, n=24, anchor=BOTTOM, spin=0, orient=UP) {
+  assert(is_in(type, WHEEL_TYPES), "Invalid wheel type");
+  assert(is_num(n) && round(n) == n, "Vertex count must be an integer");
+  assert(n > 3, "Vertex count must be more than 3");
   height = wheelWidth+wheelContactOffset+wheelAxelLength;
   
   anchors = [
