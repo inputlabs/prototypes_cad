@@ -27,7 +27,7 @@ class BlenderObject:
         data.name = self.entity.name
         data.location = BlenderVector(self.entity.location).export()
         data.scale = BlenderVector(self.entity.scale).export()
-        data.rotation_mode = self.entity.rotation_mode
+        data.rotation_euler = BlenderVector(self.entity.rotation_euler).export()
         data.vertex_groups = 'TODO' # str(self.entity.vertex_groups)
         data.hide_render = self.entity.hide_render
         data.hide_select = self.entity.hide_select
@@ -55,10 +55,10 @@ class BlenderObject:
         for modifier_json in obj_json['modifiers']:
             tpe = modifier_json['type']
             name = modifier_json['name']
-            modifier = obj.modifiers.new(name, tpe)
-            if tpe == 'SOLIDIFY': modifier_blender = BlenderSolidify(modifier)
-            if tpe == 'BEVEL': modifier_blender = BlenderBevel(modifier)
-            modifier_blender.update(modifier_json)
+            modifier_blender = obj.modifiers.new(name, tpe)
+            if tpe == 'SOLIDIFY': modifier = BlenderSolidify(modifier_blender)
+            if tpe == 'BEVEL': modifier = BlenderBevel(modifier_blender)
+            modifier.update(modifier_json)
         return obj
 
 
@@ -69,17 +69,46 @@ class BlenderMesh:
     def export(self):
         data = SimpleNamespace()
         data.name = self.entity.name
-        data.vertices = []
-        for vertex in self.entity.vertices:
-            v = SimpleNamespace()
-            v.co = BlenderVector(vertex.co).export()
-            if vertex.bevel_weight:
-                v.bw = vertex.bevel_weight
-            data.vertices.append(v.__dict__)
-        data.polygons = []
-        for polygon in self.entity.polygons:
-            data.polygons.append([v for v in polygon.vertices])
+        if self.is_parametrizable():
+            # TODO: Remove extra dimension.
+            if self.is_rectangle():
+                vertices = [v.co for v in self.entity.vertices]
+                normal = self.get_normal()
+                data.sketch = Rectangle(vertices, normal).export()
+        else:
+            data.vertices = []
+            for vertex in self.entity.vertices:
+                v = SimpleNamespace()
+                v.co = BlenderVector(vertex.co).export()
+                if vertex.bevel_weight:
+                    v.bw = vertex.bevel_weight
+                data.vertices.append(v.__dict__)
+            data.polygons = []
+            for polygon in self.entity.polygons:
+                data.polygons.append([v for v in polygon.vertices])
         return data.__dict__
+
+    def is_parametrizable(self):
+        faces = self.entity.polygons
+        if len(faces) != 1: return False
+        # TODO: Check if all vertices are on the same plane.
+        return True
+
+    def is_rectangle(self):
+        vertices = [v.co for v in self.entity.vertices]
+        if len(vertices) != 4: return False
+        if len(set([v.x for v in vertices])) > 2: return False
+        if len(set([v.y for v in vertices])) > 2: return False
+        if len(set([v.z for v in vertices])) > 2: return False
+        return True
+
+    def get_normal(self):
+        vertices = [v.co for v in self.entity.vertices]
+        if len(set([v.x for v in vertices])) == 1: return [1, 0, 0]
+        if len(set([v.y for v in vertices])) == 1: return [0, 1, 0]
+        if len(set([v.z for v in vertices])) == 1: return [0, 0, 1]
+        # TODO: Support flipped faces.
+        raise Exception('Could not determine normal')
 
     @staticmethod
     def from_json(mesh_json):
@@ -89,6 +118,24 @@ class BlenderMesh:
         mesh.from_pydata(vertices, [], polygons)
         return mesh
 
+class Rectangle:
+    def __init__(self, vertices, normal):
+        self.vertices = vertices
+        self.normal = normal
+
+    def export(self):
+        data = SimpleNamespace()
+        data.type = 'RECTANGLE'
+        data.normal = self.normal
+        all_x = [v.x for v in self.vertices]
+        all_y = [v.y for v in self.vertices]
+        data.center = [
+            (max(all_x) - min(all_x)) / 2,
+            (max(all_y) - min(all_y)) / 2,
+        ]
+        data.width = max(all_x) - min(all_x)
+        data.height = max(all_y) - min(all_y)
+        return data.__dict__
 
 class BlenderSolidify:
     def __init__(self, entity):
@@ -164,7 +211,7 @@ class ExportBCAD(Operator, ExportHelper):
         def repl(match):
             string = match.group(1)
             joined = re.sub('\n\s*', ' ', string, flags=re.DOTALL)
-            if len(joined) < 100:
+            if len(joined) < 80:
                 return joined
             else:
                 return string
