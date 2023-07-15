@@ -14,6 +14,11 @@ bl_info = {
     "category": "Import-Export",
 }
 
+def debug(message, title="Info", icon='INFO'):
+    def draw(self, context):
+        self.layout.label(text=message)
+    bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
+
 # Classes.
 class BlenderObject:
     def __init__(self, entity):
@@ -113,8 +118,27 @@ class BlenderMesh:
     @staticmethod
     def from_json(mesh_json):
         mesh = bpy.data.meshes.new(mesh_json['name'])
-        vertices = [v['co'] for v in mesh_json['vertices']]
-        polygons = [p for p in mesh_json['polygons']]
+        if mesh_json['sketch']:
+            sketch = mesh_json['sketch']
+            if sketch['type'] == 'RECTANGLE':
+                center = sketch['center']
+                width = sketch['width']
+                height = sketch['height']
+                origin = [
+                    center[0] - (width/2),
+                    center[1] - (height/2),
+                ]
+                vertices = [
+                    [origin[0],       origin[1],        0],
+                    [origin[0]+width, origin[1],        0],
+                    [origin[0]+width, origin[1]+height, 0],
+                    [origin[0],       origin[1]+height, 0],
+                ]
+                polygons = [[0, 1, 2, 3]]
+                # debug(f'{center} / {width} / {height} / {origin}')
+        else:
+            vertices = [v['co'] for v in mesh_json['vertices']]
+            polygons = [p for p in mesh_json['polygons']]
         mesh.from_pydata(vertices, [], polygons)
         return mesh
 
@@ -130,8 +154,8 @@ class Rectangle:
         all_x = [v.x for v in self.vertices]
         all_y = [v.y for v in self.vertices]
         data.center = [
-            (max(all_x) - min(all_x)) / 2,
-            (max(all_y) - min(all_y)) / 2,
+            min(all_x) + ((max(all_x) - min(all_x)) / 2),
+            min(all_y) + ((max(all_y) - min(all_y)) / 2),
         ]
         data.width = max(all_x) - min(all_x)
         data.height = max(all_y) - min(all_y)
@@ -194,7 +218,7 @@ class ExportBCAD(Operator, ExportHelper):
         scene = SimpleNamespace()
         scene.unit_system = 'metric' # TODO
         scene.unit_scale = 0.001 # TODO
-        scene.unit_name = 'Millimeter' # TODO
+        scene.unit = 'Millimeter' # TODO
         bcad.scene = scene.__dict__
         bcad.objects = []
         # self.report({'INFO'}, str(data))
