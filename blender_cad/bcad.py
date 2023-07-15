@@ -29,12 +29,11 @@ class BlenderObject:
         data.scale = BlenderVector(self.entity.scale).export()
         data.rotation_mode = self.entity.rotation_mode
         data.vertex_groups = 'TODO' # str(self.entity.vertex_groups)
-        data.modifiers = str(self.entity.modifiers)
         data.hide_render = self.entity.hide_render
         data.hide_select = self.entity.hide_select
         data.hide_viewport = self.entity.hide_viewport
-        data.data = BlenderMesh(self.entity.data).export()
         data.modifiers = []
+        data.data = BlenderMesh(self.entity.data).export()
         for modifier in self.entity.modifiers:
             if modifier.type == 'SOLIDIFY':
                 modifier_data = BlenderSolidify(modifier).export()
@@ -52,6 +51,14 @@ class BlenderObject:
         view_layer.active_layer_collection.collection.objects.link(obj)
         obj.select_set(True)
         view_layer.objects.active = obj
+        # Generate modifiers
+        for modifier_json in obj_json['modifiers']:
+            tpe = modifier_json['type']
+            name = modifier_json['name']
+            modifier = obj.modifiers.new(name, tpe)
+            if tpe == 'SOLIDIFY': modifier_blender = BlenderSolidify(modifier)
+            if tpe == 'BEVEL': modifier_blender = BlenderBevel(modifier)
+            modifier_blender.update(modifier_json)
         return obj
 
 
@@ -78,7 +85,7 @@ class BlenderMesh:
     def from_json(mesh_json):
         mesh = bpy.data.meshes.new(mesh_json['name'])
         vertices = [v['co'] for v in mesh_json['vertices']]
-        polygons = [p['vertices'] for p in mesh_json['polygons']]
+        polygons = [p for p in mesh_json['polygons']]
         mesh.from_pydata(vertices, [], polygons)
         return mesh
 
@@ -87,9 +94,14 @@ class BlenderSolidify:
     def __init__(self, entity):
         self.entity = entity
 
+    def update(self, modifier_json):
+        self.entity.thickness = modifier_json['thickness']
+        self.entity.offset = modifier_json['offset']
+
     def export(self):
         data = SimpleNamespace()
         data.type = self.entity.type
+        data.name = self.entity.name
         data.thickness = round(self.entity.thickness, ndigits=5)
         data.offset = self.entity.offset
         return data.__dict__
@@ -99,9 +111,14 @@ class BlenderBevel:
     def __init__(self, entity):
         self.entity = entity
 
+    def update(self, modifier_json):
+        self.entity.width = modifier_json['width']
+        self.entity.segments = modifier_json['segments']
+
     def export(self):
         data = SimpleNamespace()
         data.type = self.entity.type
+        data.name = self.entity.name
         data.width = round(self.entity.width, ndigits=5)
         data.segments = self.entity.segments
         return data.__dict__
@@ -147,7 +164,7 @@ class ExportBCAD(Operator, ExportHelper):
         def repl(match):
             string = match.group(1)
             joined = re.sub('\n\s*', ' ', string, flags=re.DOTALL)
-            if len(joined) < 120:
+            if len(joined) < 100:
                 return joined
             else:
                 return string
