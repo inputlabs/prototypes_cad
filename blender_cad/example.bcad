@@ -4,27 +4,56 @@
   "objects": [
     {
       "type": "MESH",
-      "name": "Cube",
+      "name": "Cuboid",
       "location": [ 0.0, 0.0, 0.0 ],
       "scale": [ 1.0, 1.0, 1.0 ],
       "rotation_euler": [ 0.0, 0.0, 0.0 ],
       "vertex_groups": "TODO",
-      "hide_render": false,
-      "hide_select": false,
-      "hide_viewport": false,
+      "hide": false,
       "modifiers": [
         { "type": "SOLIDIFY", "name": "Solidify", "thickness": 6.0, "offset": 1.0 },
+        {
+          "type": "BOOLEAN",
+          "name": "Boolean",
+          "operation": "DIFFERENCE",
+          "operand_type": "OBJECT",
+          "object": "Hexagon"
+        },
         { "type": "BEVEL", "name": "Bevel", "width": 0.1, "segments": 1 }
       ],
       "data": {
-        "name": "Cube.001",
-        "sketch": {
+        "name": "Plane",
+        "primitive": {
           "type": "RECTANGLE",
           "normal": [ 0, 0, 1 ],
           "center": [ 1.0, 2.0 ],
           "width": 4.0,
           "height": 3.0
         }
+      }
+    },
+    {
+      "type": "MESH",
+      "name": "Hexagon",
+      "location": [ 1.0, 1.0, -1.0 ],
+      "scale": [ 1.0, 1.0, 1.0 ],
+      "rotation_euler": [ 0.0, 0.0, 0.0 ],
+      "vertex_groups": "TODO",
+      "hide": true,
+      "modifiers": [ { "type": "SOLIDIFY", "name": "Solidify", "thickness": 8.0, "offset": 1.0 } ],
+      "data": {
+        "name": "Hexagon.001",
+        "vertices": [
+          { "co": [ 0.0, 1.0, 0.0 ] },
+          { "co": [ -0.86603, 0.5, 0.0 ] },
+          { "co": [ -0.86603, -0.5, 0.0 ] },
+          { "co": [ 0.0, -1.0, 0.0 ] },
+          { "co": [ 0.86603, -0.5, 0.0 ] },
+          { "co": [ 0.86603, 0.5, 0.0 ] }
+        ],
+        "polygons": [
+          [ 1, 2, 3, 4, 5, 0 ]
+        ]
       }
     }
   ]

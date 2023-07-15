@@ -31,12 +31,12 @@ In Blender, `Preferences > Add-ons > Install`, and select `bcad.py`.
 If the mesh has a single face, and all vertex are coplanar, it saves the geometry as a primitive of the type:
 - Square.
 - Rectangle.
-- Circle. (TODO)
+- Circle / Regular polygon. (TODO)
 - Polygon with relative dimensions from point to point (TODO).
-- In theory this the sketch data from Blender CAD Sketcher could be also saved here.
+- In theory sketch+constrain data from Blender CAD Sketcher could be also saved here.
 
 Otherwise geometry data is stored with Blender native structure (a big list of vertices and faces).
 
-## Road blockers
+## Challenges
 - Modifiers that reference objects (eg `Boolean` modifier), these references will have to be encoded in the JSON file so they can be recreated.
 - Assembly using Blender `File link` won't work anymore, so this format should also support cross-file references.

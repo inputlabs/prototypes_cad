@@ -36,9 +36,7 @@ class BlenderObject:
         data.scale = BlenderVector(self.entity.scale).export()
         data.rotation_euler = BlenderVector(self.entity.rotation_euler).export()
         data.vertex_groups = 'TODO' # str(self.entity.vertex_groups)
-        data.hide_render = self.entity.hide_render
-        data.hide_select = self.entity.hide_select
-        data.hide_viewport = self.entity.hide_viewport
+        data.hide = self.entity.hide_get()
         data.modifiers = []
         data.data = BlenderMesh(self.entity.data).export()
         for modifier in self.entity.modifiers:
@@ -48,16 +46,24 @@ class BlenderObject:
             if modifier.type == 'BEVEL':
                 modifier_data = BlenderBevel(modifier).export()
                 data.modifiers.append(modifier_data)
+            if modifier.type == 'BOOLEAN':
+                modifier_data = BlenderBoolean(modifier).export()
+                data.modifiers.append(modifier_data)
         return data.__dict__
 
     @staticmethod
     def from_json(obj_json):
+        # Create mesh.
         mesh = BlenderMesh.from_json(obj_json['data'])
+        # Create object.
         obj = bpy.data.objects.new(name=obj_json['name'], object_data=mesh)
+        obj.location = obj_json['location']
+        # Set active
         view_layer = bpy.context.view_layer
         view_layer.active_layer_collection.collection.objects.link(obj)
         obj.select_set(True)
         view_layer.objects.active = obj
+        obj.hide_set(obj_json['hide'])
         # Generate modifiers
         for modifier_json in obj_json['modifiers']:
             tpe = modifier_json['type']
@@ -65,6 +71,7 @@ class BlenderObject:
             modifier_blender = obj.modifiers.new(name, tpe)
             if tpe == 'SOLIDIFY': modifier = BlenderSolidify(modifier_blender)
             if tpe == 'BEVEL': modifier = BlenderBevel(modifier_blender)
+            if tpe == 'BOOLEAN': modifier = BlenderBoolean(modifier_blender)
             modifier.update(modifier_json)
         return obj
 
@@ -81,7 +88,7 @@ class BlenderMesh:
             if self.is_rectangle():
                 vertices = [v.co for v in self.entity.vertices]
                 normal = self.get_normal()
-                data.sketch = Rectangle(vertices, normal).export()
+                data.primitive = Rectangle(vertices, normal).export()
         else:
             data.vertices = []
             for vertex in self.entity.vertices:
@@ -99,7 +106,7 @@ class BlenderMesh:
         faces = self.entity.polygons
         if len(faces) != 1: return False
         # TODO: Check if all vertices are on the same plane.
-        return True
+        if self.is_rectangle(): return True # TODO: This is redundant
 
     def is_rectangle(self):
         vertices = [v.co for v in self.entity.vertices]
@@ -120,12 +127,12 @@ class BlenderMesh:
     @staticmethod
     def from_json(mesh_json):
         mesh = bpy.data.meshes.new(mesh_json['name'])
-        if mesh_json['sketch']:
-            sketch = mesh_json['sketch']
-            if sketch['type'] == 'RECTANGLE':
-                center = sketch['center']
-                width = sketch['width']
-                height = sketch['height']
+        if 'primitive' in mesh_json:
+            primitive = mesh_json['primitive']
+            if primitive['type'] == 'RECTANGLE':
+                center = primitive['center']
+                width = primitive['width']
+                height = primitive['height']
                 origin = [
                     center[0] - (width/2),
                     center[1] - (height/2),
@@ -196,6 +203,30 @@ class BlenderBevel:
         data.segments = self.entity.segments
         return data.__dict__
 
+
+class BlenderBoolean:
+    def __init__(self, entity):
+        self.entity = entity
+
+    def update(self, modifier_json):
+        self.entity.operation = modifier_json['operation']
+        self.entity.operand_type = modifier_json['operand_type']
+        ref = delayObjectReference(
+            self.entity,
+            'object',
+            modifier_json['object']
+        )
+        references.append(ref)
+
+    def export(self):
+        data = SimpleNamespace()
+        data.type = self.entity.type
+        data.name = self.entity.name
+        data.operation = self.entity.operation
+        data.operand_type = self.entity.operand_type
+        data.object = self.entity.object.name
+        return data.__dict__
+
 class BlenderVector:
     def __init__(self, vector):
         self.vector = vector
@@ -206,6 +237,18 @@ class BlenderVector:
             round(self.vector.y, ndigits=5),
             round(self.vector.z, ndigits=5)
         ]
+
+references = []
+class delayObjectReference:
+    def __init__(self, target, attribute, value):
+        self.target = target
+        self.attribute = attribute
+        self.value = value
+
+    def attach(self, report):
+        value = [x for x in bpy.data.objects if x.name==self.value][0]
+        report({'INFO'}, f'{self.target} {self.attribute} {self.value} {value}')
+        setattr(self.target, self.attribute, value)
 
 
 class ExportBCAD(Operator, ExportHelper):
@@ -257,6 +300,8 @@ class ImportBCAD(Operator, ImportHelper):
         data = json.loads(f.read())
         for obj_json in data['objects']:
             BlenderObject.from_json(obj_json)
+        for reference in references:
+            reference.attach(self.report)
         # self.report({'INFO'}, str(data))
         return {'FINISHED'}
 
