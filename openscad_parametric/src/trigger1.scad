@@ -44,8 +44,6 @@ triggerSurfaceDraft2Width = 1.5;
 
 chamfer = 0.5;
 
-defaultFit = FIT_TIGHT;
-
 /**
  * Module: _trigger1Body()
  * Description: Creates a body for R1 and L1 trigger.
