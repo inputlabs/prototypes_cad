@@ -1,0 +1,31 @@
+{
+  "format_version": "0.0.1",
+  "scene": { "unit_system": "metric", "unit_scale": 0.001, "unit": "Millimeter" },
+  "objects": [
+    {
+      "type": "MESH",
+      "name": "Cube",
+      "location": [ 0.0, 0.0, 0.0 ],
+      "scale": [ 1.0, 1.0, 1.0 ],
+      "rotation_euler": [ 0.0, 0.0, 0.0 ],
+      "vertex_groups": "TODO",
+      "hide_render": false,
+      "hide_select": false,
+      "hide_viewport": false,
+      "modifiers": [
+        { "type": "SOLIDIFY", "name": "Solidify", "thickness": 6.0, "offset": 1.0 },
+        { "type": "BEVEL", "name": "Bevel", "width": 0.1, "segments": 1 }
+      ],
+      "data": {
+        "name": "Cube.001",
+        "sketch": {
+          "type": "RECTANGLE",
+          "normal": [ 0, 0, 1 ],
+          "center": [ 1.0, 2.0 ],
+          "width": 4.0,
+          "height": 3.0
+        }
+      }
+    }
+  ]
+}

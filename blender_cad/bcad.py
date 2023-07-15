@@ -1,3 +1,5 @@
+# All rights reserved, Input Labs Oy.
+
 import json
 import pprint
 import re
@@ -241,7 +243,7 @@ class ExportBCAD(Operator, ExportHelper):
                 return string
         data = re.sub('(\[[^\[]+?\])', repl, data, flags=re.DOTALL)
         data = re.sub('(\{[^\{]+?\})', repl, data, flags=re.DOTALL)
-        return data
+        return data + '\n'
 
 
 class ImportBCAD(Operator, ImportHelper):
