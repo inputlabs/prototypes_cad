@@ -16,7 +16,6 @@
           "type": "BOOLEAN",
           "name": "Boolean",
           "operation": "DIFFERENCE",
-          "operand_type": "OBJECT",
           "object": "Hexagon"
         },
         { "type": "BEVEL", "name": "Bevel", "width": 0.1, "segments": 1 }

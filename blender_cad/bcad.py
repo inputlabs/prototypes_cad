@@ -210,7 +210,7 @@ class BlenderBoolean:
 
     def update(self, modifier_json):
         self.entity.operation = modifier_json['operation']
-        self.entity.operand_type = modifier_json['operand_type']
+        # self.entity.operand_type = modifier_json['operand_type']
         ref = delayObjectReference(
             self.entity,
             'object',
@@ -223,7 +223,7 @@ class BlenderBoolean:
         data.type = self.entity.type
         data.name = self.entity.name
         data.operation = self.entity.operation
-        data.operand_type = self.entity.operand_type
+        # data.operand_type = self.entity.operand_type
         data.object = self.entity.object.name
         return data.__dict__
 
@@ -277,15 +277,20 @@ class ExportBCAD(Operator, ExportHelper):
         return {'FINISHED'}
 
     def prettify(self, data):
-        def repl(match):
+        def join_short(match):
             string = match.group(1)
             joined = re.sub('\n\s*', ' ', string, flags=re.DOTALL)
-            if len(joined) < 80:
-                return joined
-            else:
-                return string
-        data = re.sub('(\[[^\[]+?\])', repl, data, flags=re.DOTALL)
-        data = re.sub('(\{[^\{]+?\})', repl, data, flags=re.DOTALL)
+            if len(joined) < 80: return joined
+            return string
+        def join_all(match):
+            string = match.group(0)
+            return re.sub('\n\s*', ' ', string, flags=re.DOTALL)
+        # Join short arrays if they fit.
+        data = re.sub('(\[[^\[]+?\])', join_short, data, flags=re.DOTALL)
+        # Join short objects if they fit.
+        data = re.sub('(\{[^\{]+?\})', join_short, data, flags=re.DOTALL)
+        # Join arrays of numbers always.
+        data = re.sub('\[[\d\s\n,]*?\]', join_all, data, flags=re.DOTALL)
         return data + '\n'
 
 
