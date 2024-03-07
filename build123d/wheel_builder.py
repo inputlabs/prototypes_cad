@@ -42,7 +42,6 @@ with BuildPart() as wheel_p:
         with PolarLocations(0, numberSpokes):
             add(wheel_l.line)  # pattern all spokes
         make_face()
-    print(len(wheel_s.sketch.edges()))
     extrude(amount=width)
     forchamfer = edges().filter_by(Axis.Z, reverse=True)
     chamfer(forchamfer, chamfering)
