@@ -73,12 +73,15 @@ with BuildPart() as wheelCore_p:
 with BuildPart() as holder_p:
     with BuildSketch(-Plane.XY) as holder_s:
         with Locations((0, leftAxleDia / 2)):
-            Trapezoid(
-                holderBaseDepth,
-                holderHeight,
-                90 - 8.746,  # magic number derived from existing version
-                align=(Align.CENTER, Align.MAX),
-            )
+            with BuildLine() as holderLine:
+                Polyline([
+                    (0, 0),
+                    (holderTopDepth / 2, 0),
+                    (holderBaseDepth / 2, holderHeight),
+                    (0, holderHeight)
+                    ])
+                mirror(holderLine.line, about=Plane.YZ)
+            make_face()
             SlotCenterToCenter(
                 leftAxleDia,
                 leftAxleDia + 2 * holderAxleTolerance,
@@ -86,6 +89,10 @@ with BuildPart() as holder_p:
                 mode=Mode.SUBTRACT,
             )
     extrude(amount=holderWidth)
+
+# show_object(wheel_p)
+# show_object(wheelCore_p)
+# show_object(holder_p)
 
 # STL Exports
 # wheel_p.part.export_stl("wheel.stl")
