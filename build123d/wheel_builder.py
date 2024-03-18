@@ -12,7 +12,7 @@ chamfering = 0.75
 coreRadius = 8
 coreTolerance = 0.06  ## Distance core-cutout > core
 contactRightWidth = 1.8
-contactRightDia = 8  # converted existing to actual diameters
+contactRightDia = 4
 hexAxleDia = 2
 hexAxleLength = 3
 leftAxleLength = 5
@@ -91,7 +91,7 @@ with BuildPart() as holder_p:
     extrude(amount=holderWidth)
 
 # show_object(wheel_p)
-# show_object(wheelCore_p)
+show_object(wheelCore_p)
 # show_object(holder_p)
 
 # STL Exports
