@@ -1,16 +1,20 @@
-from build123d import *
+from build123d import BuildSketch, BuildPart, BuildLine, Circle, Plane, \\
+    Line, Locations, PolarLine, Polyline, PolarLocations, RegularPolygon, \\
+    SlotCenterToCenter, Keep, Mode, Axis, Kind
+from build123d import add, split, mirror, make_face, faces, extrude, edges, \\
+    chamfer, offset
 from math import cos, pi
 
-## Wheel
+# Wheel
 numberSpokes = 24
 outerRadius: float = 10.75
 innerRadius: float = 10.25
 width = 6.75
 chamfering = 0.75
 
-## Core
+# Core
 coreRadius = 8
-coreTolerance = 0.06  ## Distance core-cutout > core
+coreTolerance = 0.06  # Distance core-cutout > core
 contactRightWidth = 1.8
 contactRightDia = 4
 hexAxleDia = 2
@@ -18,11 +22,11 @@ hexAxleLength = 3
 leftAxleLength = 5
 leftAxleDia = hexAxleDia * cos(pi / 6)
 
-## Holder
-holderBaseDepth = 13.8  ## original 13
+# Holder
+holderBaseDepth = 13.8  # original 13
 holderTopDepth = 9.8
 holderHeight = 13
-holderWidth = 8.3  ## original 7
+holderWidth = 8.3  # original 7
 holderAxleTolerance = 0.1
 
 with BuildSketch() as core_s:
