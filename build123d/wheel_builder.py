@@ -1,7 +1,7 @@
-from build123d import BuildSketch, BuildPart, BuildLine, Circle, Plane, \\
-    Line, Locations, PolarLine, Polyline, PolarLocations, RegularPolygon, \\
+from build123d import BuildSketch, BuildPart, BuildLine, Circle, Plane, \
+    Line, Locations, PolarLine, Polyline, PolarLocations, RegularPolygon, \
     SlotCenterToCenter, Keep, Mode, Axis, Kind
-from build123d import add, split, mirror, make_face, faces, extrude, edges, \\
+from build123d import add, split, mirror, make_face, faces, extrude, edges, \
     chamfer, offset
 from math import cos, pi
 
