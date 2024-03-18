@@ -91,7 +91,7 @@ with BuildPart() as holder_p:
     extrude(amount=holderWidth)
 
 # show_object(wheel_p)
-show_object(wheelCore_p)
+# show_object(wheelCore_p)
 # show_object(holder_p)
 
 # STL Exports
