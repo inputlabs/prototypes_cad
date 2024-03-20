@@ -32,7 +32,6 @@ holderAxleTolerance = 0.1
 with BuildSketch() as core_s:
     Circle(coreRadius)
     split(bisect_by=Plane.XZ.offset(leftAxleDia / 2), keep=Keep.BOTTOM)
-    split(bisect_by=Plane.YZ.offset(coreRadius - 0.5), keep=Keep.BOTTOM)
 
 with BuildPart() as wheel_p:
     with BuildSketch() as wheel_s:
