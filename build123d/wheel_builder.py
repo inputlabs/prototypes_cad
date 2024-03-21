@@ -28,6 +28,7 @@ holderTopDepth = 9.8
 holderHeight = 13
 holderWidth = 8.3  # original 7
 holderAxleTolerance = 0.1
+holderAxleHeightTolerance = 0.1
 
 with BuildSketch() as core_s:
     Circle(coreRadius)
@@ -86,13 +87,13 @@ with BuildPart() as holder_p:
                 mirror(holderLine.line, about=Plane.YZ)
             make_face()
             SlotCenterToCenter(
-                leftAxleDia,
+                leftAxleDia + 2 * holderAxleHeightTolerance,
                 leftAxleDia + 2 * holderAxleTolerance,
                 90,
                 mode=Mode.SUBTRACT,
-            )
+                )
     extrude(amount=holderWidth)
-
+    
 # show_object(wheel_p)
 # show_object(wheelCore_p)
 # show_object(holder_p)
