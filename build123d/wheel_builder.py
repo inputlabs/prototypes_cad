@@ -17,8 +17,8 @@ coreRadius = 8
 coreTolerance = 0.06  # Distance core-cutout > core
 contactRightWidth = 1.8
 contactRightDia = 4
-hexAxleDia = 2
-hexAxleLength = 3
+hexAxleDia = 2.05
+hexAxleLength = 3.5
 leftAxleLength = 5
 leftAxleDia = hexAxleDia * cos(pi / 6)
 
@@ -27,8 +27,9 @@ holderBaseDepth = 13.8  # original 13
 holderTopDepth = 9.8
 holderHeight = 13
 holderWidth = 8.3  # original 7
-holderAxleTolerance = 0.1
-holderAxleHeightTolerance = 0.1
+holderAxleTolerance = 0.2
+holderAxleHeight = 1.0
+
 
 with BuildSketch() as core_s:
     Circle(coreRadius)
@@ -74,6 +75,7 @@ with BuildPart() as wheelCore_p:
         Circle(leftAxleDia / 2)
     extrude(amount=-leftAxleLength)
 
+
 with BuildPart() as holder_p:
     with BuildSketch(-Plane.XY) as holder_s:
         with Locations((0, leftAxleDia / 2)):
@@ -86,12 +88,8 @@ with BuildPart() as holder_p:
                     ])
                 mirror(holderLine.line, about=Plane.YZ)
             make_face()
-            SlotCenterToCenter(
-                leftAxleDia + 2 * holderAxleHeightTolerance,
-                leftAxleDia + 2 * holderAxleTolerance,
-                90,
-                mode=Mode.SUBTRACT,
-                )
+            with Locations((0, holderAxleHeight)):
+                Circle(leftAxleDia / 2 + holderAxleTolerance, mode=Mode.SUBTRACT)
     extrude(amount=holderWidth)
     
 # show_object(wheel_p)
