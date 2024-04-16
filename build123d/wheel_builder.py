@@ -14,7 +14,7 @@ chamfering = 0.75
 
 # Core
 coreRadius = 8
-coreTolerance = 0.06  # Distance core-cutout > core
+coreTolerance = 0.08  # Distance core-cutout > core
 contactRightWidth = 1.8
 contactRightDia = 4
 hexAxleDia = 2.05
